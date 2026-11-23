@@ -41,12 +41,21 @@ ZMANIM = [
     ("tzeit72min", "צאת ר״ת", "Tzeis", "72 דק׳ קבועות"),
 ]
 
+def _truetype_with_fallback(size, *paths):
+    for p in paths:
+        try:
+            return ImageFont.truetype(p, size)
+        except OSError:
+            continue
+    raise OSError(f"none of the font paths exist: {paths}")
+
+
 F_TITLE = ImageFont.truetype(NOTO + "NotoSansHebrew-Bold.ttf", 58)
 F_SUB = ImageFont.truetype(DEJAVU + "DejaVuSans.ttf", 30)
 F_SUB_HE = ImageFont.truetype(NOTO + "NotoSansHebrew-Regular.ttf", 30)
 F_STATUS_HE = ImageFont.truetype(DEJAVU + "DejaVuSans.ttf", 34)
 F_STATUS_EN = ImageFont.truetype(DEJAVU + "DejaVuSans-Bold.ttf", 34)
-F_ROW_HE = ImageFont.truetype(NOTO + "NotoSansHebrew-SemiBold.ttf", 40)
+F_ROW_HE = _truetype_with_fallback(40, NOTO + "NotoSansHebrew-SemiBold.ttf", NOTO + "NotoSansHebrew-Bold.ttf", NOTO + "NotoSansHebrew-Regular.ttf")
 F_ROW_EN = ImageFont.truetype(DEJAVU + "DejaVuSans.ttf", 26)
 F_METHOD = ImageFont.truetype(DEJAVU + "DejaVuSans.ttf", 26)
 F_TIME = ImageFont.truetype(DEJAVU + "DejaVuSans-Bold.ttf", 44)
