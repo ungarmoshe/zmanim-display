@@ -30,17 +30,19 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y fonts-noto-core fonts-dejavu-core
           pip install pillow
-      - name: Generate image
-        run: python generate.py 11205 zmanim.jpg
+      - name: Generate images
+        run: |
+          python generate.py 11205 zmanim.jpg
+          python generate_landscape.py 11205 zmanim-landscape.jpg
       - name: Commit updated image
         run: |
           git config user.name "zmanim-bot"
           git config user.email "actions@github.com"
-          git add zmanim.jpg
+          git add zmanim.jpg zmanim-landscape.jpg
           git commit -m "zmanim $(date -u +%Y-%m-%d)" || echo "no changes"
           git push
       - name: Stage Pages site
-        run: mkdir -p _site && cp zmanim.jpg _site/
+        run: mkdir -p _site && cp zmanim.jpg zmanim-landscape.jpg _site/
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload GitHub Pages artifact
