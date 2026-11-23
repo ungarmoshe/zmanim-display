@@ -1,0 +1,62 @@
+name: Daily zmanim image
+
+on:
+  schedule:
+    # 6:37 UTC = 2:37 AM EDT / 1:37 AM EST - off-peak minute, well before
+    # the earliest NYC dawn (~3:50 AM EDT in June), so even a delayed run
+    # lands hours before alos.
+    - cron: '37 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install fonts and Pillow
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fonts-noto-core fonts-dejavu-core
+          pip install pillow
+      - name: Generate image
+        run: python generate.py 11205 zmanim.jpg
+      - name: Commit updated image
+        run: |
+          git config user.name "zmanim-bot"
+          git config user.email "actions@github.com"
+          git add zmanim.jpg
+          git commit -m "zmanim $(date -u +%Y-%m-%d)" || echo "no changes"
+          git push
+      - name: Stage Pages site
+        run: mkdir -p _site && cp zmanim.jpg _site/
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
