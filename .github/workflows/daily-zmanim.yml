@@ -2,10 +2,13 @@ name: Daily zmanim image
 
 on:
   schedule:
-    # 6:37 UTC = 2:37 AM EDT / 1:37 AM EST - off-peak minute, well before
-    # the earliest NYC dawn (~3:50 AM EDT in June), so even a delayed run
-    # lands hours before alos.
+    # Several off-peak slots per day. GitHub can delay or drop scheduled runs
+    # under load, so later slots act as backups for the 1:37 AM EST one.
+    # Each run regenerates both images for the current New York date.
     - cron: '37 6 * * *'
+    - cron: '17 8 * * *'
+    - cron: '47 10 * * *'
+    - cron: '23 13 * * *'
   workflow_dispatch:
 
 permissions:
